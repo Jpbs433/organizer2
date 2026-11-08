@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Organizer">
+<title>Organizer — Tu espacio personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#007aff;--accent-soft:rgba(0,122,255,.10);
+  --bg:#f5f5f7;--panel:rgba(255,255,255,.9);--soft:#f0f0f2;
+  --text:#1d1d1f;--muted:#86868b;--line:rgba(60,60,67,.13);
+  --green:#30a46c;--orange:#d98927;--red:#ff453a;
+  --shadow:0 10px 35px rgba(0,0,0,.045);--radius-card:22px;
+  --blur:blur(22px) saturate(180%);
+}
+body.dark{
+  --bg:#000;--panel:rgba(28,28,30,.9);--soft:#2c2c2e;
+  --text:#f5f5f7;--muted:#98989d;--line:rgba(255,255,255,.12);
+  --accent:#0a84ff;--accent-soft:rgba(10,132,255,.17);
+  --green:#30d158;--orange:#ff9f0a;--red:#ff6961;
+  --shadow:0 12px 35px rgba(0,0,0,.2);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;
+ letter-spacing:-.015em;-webkit-font-smoothing:antialiased;min-height:100dvh;
+ padding-bottom:env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+::selection{background:rgba(0,122,255,.2)}
+.app{display:grid;grid-template-columns:245px 1fr;min-height:100dvh}
+.sidebar{background:var(--panel);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+ border-right:1px solid var(--line);padding:30px 17px;position:sticky;top:0;height:100vh;
+ display:flex;flex-direction:column;overflow:auto}
+.brand{font-weight:800;letter-spacing:1.7px;font-size:19px;padding:5px 10px}
+.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:1.15px;margin-top:4px;font-weight:600}
+.nav-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin:28px 10px 9px}
+.nav{border:0;background:transparent;color:var(--muted);padding:12px;border-radius:13px;text-align:left;
+ width:100%;display:flex;gap:12px;align-items:center;font-size:13px;margin:2px 0;font-weight:550;
+ transition:background .2s,color .2s,transform .2s}
+.nav:hover,.nav.active{background:var(--accent-soft);color:var(--accent)}
+.nav:active{transform:scale(.97)}
+.nav span{width:20px;text-align:center;font-size:17px}
+.side-bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:15px}
+.main{padding:34px 5% 60px;max-width:1500px;width:100%;margin:auto;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:12px;min-height:42px}
+.top small{color:var(--muted);font-size:12px;font-weight:550;text-transform:capitalize}
+.top-actions{display:flex;gap:8px;align-items:center}
+.search,.field{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:13px;
+ padding:11px 13px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s}
+.search{width:210px;font-size:13px}
+.search:focus,.field:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.btn{border:0;background:var(--accent);color:#fff;border-radius:13px;padding:12px 16px;font-size:13px;
+ font-weight:650;box-shadow:0 3px 9px rgba(0,122,255,.13);transition:transform .18s,filter .18s;display:inline-block;text-align:center}
+.btn:hover{filter:brightness(1.05)}.btn:active{transform:scale(.97)}
+.btn.secondary{background:var(--soft);color:var(--text);box-shadow:none}
+.btn.danger{background:rgba(255,69,58,.12);color:var(--red);box-shadow:none}
+.btn.small{padding:8px 12px;font-size:12px;border-radius:11px}
+.icon-btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:50%;
+ width:42px;height:42px;flex:0 0 42px;font-size:16px;transition:transform .18s}
+.icon-btn:active{transform:scale(.92)}
+h1{font-size:clamp(29px,3vw,38px);line-height:1.08;letter-spacing:-1.45px;font-weight:760;margin:0 0 7px}
+h2{font-size:20px;letter-spacing:-.65px;font-weight:700;margin:0}
+h3{font-size:15px;letter-spacing:-.25px;font-weight:680;margin:0}
+p{line-height:1.6}
+.muted{color:var(--muted)}.small{font-size:11px}
+.page{display:none}
+.page.active{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.heading{margin-bottom:26px}
+.heading p{font-size:14px;color:var(--muted);margin:5px 0;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:15px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-card);padding:22px;
+ box-shadow:var(--shadow);min-width:0;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.s12{grid-column:span 12}.s8{grid-column:span 8}.s7{grid-column:span 7}.s6{grid-column:span 6}.s5{grid-column:span 5}.s4{grid-column:span 4}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.stat{font-size:34px;font-weight:760;letter-spacing:-1.4px;margin:10px 0 2px}
+.stat-label{font-size:12px;color:var(--muted)}
+.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.pill{font-size:10px;border-radius:999px;padding:6px 10px;background:var(--accent-soft);color:var(--accent);font-weight:700;letter-spacing:.045em;white-space:nowrap}
+.chip{font-size:10px;font-weight:650;border-radius:999px;padding:4px 9px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.red{background:rgba(255,69,58,.12);color:var(--red)}
+.chip.orange{background:rgba(255,159,10,.15);color:var(--orange)}
+.chip.green{background:rgba(48,164,108,.14);color:var(--green)}
+.chip.blue{background:var(--accent-soft);color:var(--accent)}
+.link{background:none;border:0;color:var(--accent);font-size:12px;font-weight:650;padding:7px 5px}
+.empty{text-align:center;color:var(--muted);font-size:12px;padding:25px 8px;line-height:1.6}
+/* áreas home */
+.area-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.area-card{border:1px solid var(--line);border-radius:18px;padding:18px;cursor:pointer;background:var(--panel);transition:transform .2s,border-color .2s}
+.area-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.area-card:active{transform:scale(.975)}
+.area-icon{font-size:25px;margin-bottom:12px}
+.area-card strong{font-size:14px;display:block}
+.area-card small{font-size:11px;color:var(--muted);display:block;margin-top:4px;line-height:1.4}
+/* tareas */
+.task-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.task-row:last-child{border:0}
+.task-row input{accent-color:var(--accent);width:21px;height:21px;flex:0 0 auto}
+.task-text{flex:1;font-size:14px;min-width:0;cursor:pointer;line-height:1.35;overflow-wrap:anywhere}
+.task-text.done{text-decoration:line-through;color:var(--muted)}
+.task-text small{display:block;color:var(--muted);margin-top:4px;font-size:11px;text-decoration:none}
+.chev{color:var(--muted);font-size:18px;transition:transform .2s;flex:0 0 auto}
+/* MAPA */
+.map-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;align-items:start}
+.map-area{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+.map-area-head{display:flex;align-items:center;gap:13px;padding:16px 16px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.map-ico{width:46px;height:46px;border-radius:14px;background:var(--accent-soft);display:grid;place-items:center;font-size:23px;flex:0 0 46px}
+.map-title{flex:1;min-width:0}
+.map-title strong{display:block;font-size:16px;letter-spacing:-.3px}
+.map-title small{font-size:11px;color:var(--muted)}
+.map-area.open .map-area-head .chev{transform:rotate(90deg)}
+.map-body{display:none;padding:2px 14px 16px}
+.map-area.open .map-body{display:block}
+.map-node{margin-top:10px;border:1px solid var(--line);border-radius:16px;background:var(--bg);overflow:hidden}
+.map-node-head{display:flex;align-items:center;gap:10px;padding:12px 12px;cursor:pointer}
+.map-node-head strong{flex:1;font-size:14px;min-width:0;overflow-wrap:anywhere}
+.count{font-size:11px;font-weight:700;color:var(--muted);background:var(--soft);border-radius:999px;min-width:24px;text-align:center;padding:3px 8px}
+.mini{border:0;background:var(--soft);color:var(--text);width:32px;height:32px;border-radius:50%;font-size:15px;font-weight:700;flex:0 0 32px;display:grid;place-items:center}
+.mini.acc{background:var(--accent);color:#fff}
+.map-tasks{border-top:1px solid var(--line);padding:2px 12px}
+.mini-task{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.mini-task:last-child{border:0}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);flex:0 0 22px;display:grid;place-items:center;font-size:12px;color:#fff;background:transparent}
+.dot.done{background:var(--green);border-color:var(--green)}
+.mt-title{flex:1;font-size:13px;min-width:0;overflow-wrap:anywhere;line-height:1.3}
+.mt-title.done{text-decoration:line-through;color:var(--muted)}
+.map-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.map-actions .btn{flex:1;min-width:120px}
+.loose-label{font-size:10px;letter-spacing:1.3px;color:var(--muted);font-weight:700;margin:16px 4px 4px}
+/* detalle tarea */
+.detail-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px}
+.save-ind{font-size:12px;color:var(--green);font-weight:600}
+.save-ind.saving{color:var(--muted)}
+.complete-btn{width:100%;border:2px solid var(--accent);background:transparent;color:var(--accent);border-radius:16px;
+ padding:15px;font-size:15px;font-weight:700;margin-bottom:16px;transition:all .2s}
+.complete-btn.done{background:var(--green);border-color:var(--green);color:#fff}
+.title-input{font-size:20px;font-weight:700;margin-bottom:14px;letter-spacing:-.4px}
+.form-group{margin-bottom:13px}
+.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px;font-weight:550}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.note-area{min-height:200px;resize:vertical;line-height:1.55}
+.note-editor{min-height:52vh;resize:vertical;line-height:1.7;font-size:15px}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:9px;margin-top:14px}
+.thumb{position:relative;aspect-ratio:1;border-radius:15px;overflow:hidden;border:1px solid var(--line);background:var(--soft)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+.thumb button{position:absolute;top:5px;right:5px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:14px}
+.file-card{border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;gap:12px;align-items:center;margin-bottom:9px}
+.file-icon{width:42px;height:42px;border-radius:13px;background:var(--soft);display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.file-info{flex:1;min-width:0}
+.file-info strong{font-size:12px;display:block;overflow-wrap:anywhere}
+.file-info small{font-size:10px;color:var(--muted)}
+.detail-hero{padding:22px;border-radius:20px;background:var(--accent-soft);margin-bottom:15px}
+.detail-hero h2{margin:8px 0}
+/* notas */
+.note-item{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.note-item:last-child{border:0}
+.note-ico{width:42px;height:42px;border-radius:13px;background:var(--accent-soft);display:grid;place-items:center;font-size:20px;flex:0 0 42px}
+.note-info{flex:1;min-width:0}
+.note-info strong{display:block;font-size:14px;overflow-wrap:anywhere}
+.note-info small{display:block;font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;overflow-wrap:anywhere}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600}
+.seg button.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+/* estudio */
+.study-layout{display:grid;grid-template-columns:1fr 300px;gap:15px}
+.study-timer{text-align:center;padding:26px 10px}
+.timer-number{font-size:clamp(58px,9vw,76px);letter-spacing:-4px;font-weight:760;font-variant-numeric:tabular-nums;margin:15px 0}
+.study-stat{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:12px}
+/* modales */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+ z-index:30;align-items:center;justify-content:center;padding:15px}
+.modal.open{display:flex}
+.modal-box{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:25px;width:100%;max-width:520px;
+ padding:23px;max-height:90vh;overflow:auto;box-shadow:0 25px 80px rgba(0,0,0,.2);-webkit-backdrop-filter:blur(25px);backdrop-filter:blur(25px)}
+.modal-box.wide{max-width:640px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:10px}
+.close{border:0;border-radius:50%;width:32px;height:32px;background:var(--soft);color:var(--text);font-size:20px;display:grid;place-items:center;flex:0 0 32px}
+.quick-item{display:flex;align-items:center;gap:14px;width:100%;border:0;background:var(--soft);color:var(--text);
+ border-radius:16px;padding:15px;margin-bottom:9px;font-size:14px;font-weight:600;text-align:left}
+.quick-item span{font-size:22px}
+/* visor */
+.viewer{display:none;position:fixed;inset:0;z-index:60;background:var(--bg);flex-direction:column}
+.viewer.open{display:flex}
+.viewer-bar{display:flex;align-items:center;gap:6px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;
+ background:var(--panel);border-bottom:1px solid var(--line);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.viewer-bar .vt{flex:1;min-width:0;font-size:13px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.viewer-bar .btn{padding:8px 11px;font-size:12px;border-radius:11px}
+.viewer-body{flex:1;overflow:auto;padding:10px;background:var(--soft);-webkit-overflow-scrolling:touch;
+ padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+.pdf-pages{margin:0 auto}
+.pdf-page{position:relative;background:#fff;margin:0 auto 10px;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.18);overflow:hidden}
+.pdf-page canvas{display:block;width:100%;height:100%}
+.pdf-page .pn{position:absolute;right:8px;bottom:6px;font-size:10px;background:rgba(0,0,0,.5);color:#fff;border-radius:999px;padding:2px 8px}
+.viewer-img{display:block;margin:0 auto;height:auto;border-radius:8px}
+.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:13px 20px;
+ border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:80;box-shadow:0 8px 30px rgba(0,0,0,.18);max-width:calc(100vw - 30px);text-align:center}
+.toast.show{opacity:1}
+.fab{position:fixed;right:22px;bottom:24px;width:56px;height:56px;border-radius:50%;border:0;background:var(--accent);color:#fff;
+ font-size:30px;line-height:1;box-shadow:0 8px 25px rgba(0,122,255,.35);z-index:20;display:grid;place-items:center;transition:transform .18s}
+.fab:active{transform:scale(.92)}
+.mobile-nav{display:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px}
+@media(max-width:1024px){.app{grid-template-columns:215px minmax(0,1fr)}.main{padding-left:28px;padding-right:28px}}
+@media(max-width:850px){
+ html,body{overflow-x:hidden}
+ .app{display:block}.sidebar{display:none}
+ .main{width:100%;max-width:760px;margin:0 auto;padding:calc(17px + env(safe-area-inset-top)) 17px calc(110px + env(safe-area-inset-bottom))}
+ .top{position:sticky;top:0;z-index:12;margin:-17px -17px 22px;padding:calc(12px + env(safe-area-inset-top)) 17px 12px;
+  background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:blur(22px) saturate(180%);
+  backdrop-filter:blur(22px) saturate(180%);border-bottom:1px solid var(--line)}
+ .search{width:min(40vw,200px);min-width:0}
+ .icon-btn{width:40px;height:40px;flex:0 0 40px}
+ h1{font-size:32px;letter-spacing:-1.2px}
+ .grid{gap:11px}
+ .s8,.s7,.s6,.s5,.s4{grid-column:span 12}
+ .grid>.card.s4{grid-column:span 4;padding:15px 12px;border-radius:17px}
+ .grid>.card.s4 .stat{font-size:27px;margin-top:8px}
+ .grid>.card.s4 .stat-label{font-size:10px;line-height:1.35}
+ .card{padding:18px;border-radius:20px}
+ .map{grid-template-columns:1fr}
+ .study-layout{grid-template-columns:minmax(0,1fr);gap:12px}
+ input,select,textarea{font-size:16px!important}
+ .field{min-height:45px}
+ .mobile-nav{display:flex;position:fixed;z-index:25;left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom));min-height:64px;
+  align-items:center;justify-content:space-around;gap:1px;padding:6px 4px;border:1px solid rgba(120,120,128,.2);border-radius:22px;
+  background:color-mix(in srgb,var(--panel) 82%,transparent);-webkit-backdrop-filter:blur(28px) saturate(190%);
+  backdrop-filter:blur(28px) saturate(190%);box-shadow:0 8px 35px rgba(0,0,0,.13)}
+ .mobile-nav .nav{flex:1;width:auto;min-width:0;min-height:50px;flex-direction:column;justify-content:center;align-items:center;
+  gap:3px;padding:5px 1px;margin:0;border-radius:15px;font-size:9.5px;white-space:nowrap;text-align:center}
+ .mobile-nav .nav span{width:auto;font-size:18px;line-height:1.15}
+ .fab{right:16px;bottom:calc(88px + env(safe-area-inset-bottom))}
+ .modal{align-items:flex-end;padding:0}
+ .modal-box,.modal-box.wide{max-width:none;max-height:88dvh;border-radius:25px 25px 0 0;padding:22px 18px calc(26px + env(safe-area-inset-bottom));animation:sheetIn .24s ease-out}
+ @keyframes sheetIn{from{transform:translateY(35px);opacity:.7}to{transform:none;opacity:1}}
+ .toast{bottom:calc(98px + env(safe-area-inset-bottom))}
+ .note-editor{min-height:46vh}
+}
+@media(max-width:430px){
+ .main{padding-left:13px;padding-right:13px}
+ .top{margin-left:-13px;margin-right:-13px;padding-left:13px;padding-right:13px}
+ h1{font-size:29px}
+ .grid>.card.s4{padding:13px 9px}.grid>.card.s4 .stat{font-size:24px}
+ .card{padding:15px}
+ .form-grid{gap:9px}
+ .area-grid{gap:9px}.area-card{padding:14px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* =========================================================
+   REFINAMIENTO: tipografía Inter, listas y componentes
+========================================================= */
+:root{
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.22,.8,.3,1);
+  --hover:rgba(120,120,128,.08);
+  --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%2386868b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+body.dark{--hover:rgba(255,255,255,.07);
+  --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23a1a1a6' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
+body,button,input,select,textarea{font-family:var(--font)}
+body{font-size:14px;letter-spacing:-.011em;font-feature-settings:"cv11","ss03";line-height:1.5}
+h1{font-weight:700;letter-spacing:-.035em}
+h2{font-weight:650;letter-spacing:-.022em;font-size:18px}
+h3{font-weight:620;letter-spacing:-.012em}
+.brand{font-weight:700;letter-spacing:.2em;font-size:14px}
+.brand small{font-weight:500;letter-spacing:.14em}
+.nav-label{font-weight:600;letter-spacing:.14em}
+.nav{font-weight:500;font-size:13.5px}.nav.active{font-weight:600}
+.pill{font-weight:600;letter-spacing:.07em;font-size:9.5px}
+.stat{font-weight:650;letter-spacing:-.045em}
+.timer-number{font-weight:600;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.chip{font-weight:600;letter-spacing:0}
+.btn{font-weight:600;letter-spacing:-.005em;box-shadow:none;border-radius:12px}
+.btn:hover{box-shadow:0 4px 14px rgba(0,122,255,.2)}
+.btn.secondary:hover{box-shadow:none;background:var(--hover)}
+
+/* Tarjetas más sobrias */
+.card{box-shadow:0 1px 2px rgba(0,0,0,.03),0 8px 28px rgba(0,0,0,.035);border-color:var(--line)}
+.heading p{font-size:14px;letter-spacing:-.005em}
+
+/* Listas desplegables (select) */
+select.field{
+  -webkit-appearance:none;appearance:none;cursor:pointer;font-weight:500;
+  padding-right:40px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;
+  background-image:var(--chev);background-repeat:no-repeat;background-position:right 15px center;background-size:11px;
+  border-radius:12px;min-height:44px;
+}
+select.field:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+select.field option{background:var(--bg);color:var(--text);font-weight:500;padding:8px}
+.field{border-radius:12px;font-weight:450}
+.field::placeholder{color:var(--muted);font-weight:400}
+input[type=date].field,input[type=time].field{min-height:44px;font-weight:500}
+.form-group label{font-weight:550;font-size:11.5px;letter-spacing:.01em;text-transform:none}
+.toolbar select.field{min-height:42px;font-size:13px}
+.seg button{font-weight:550;transition:all .2s var(--ease)}
+
+/* Desplegable del mapa con animación suave */
+.map-area{transition:box-shadow .3s var(--ease),border-color .3s var(--ease)}
+.map-area.open{border-color:color-mix(in srgb,var(--accent) 28%,var(--line))}
+.map-area-head{transition:background .2s}
+.map-area-head:hover{background:var(--hover)}
+.map-area-head:active{background:var(--accent-soft)}
+.map-ico{background:var(--accent-soft);border-radius:13px}
+.map-title strong{font-weight:650;letter-spacing:-.02em;font-size:15.5px}
+.map-title small{font-weight:450}
+.chev{transition:transform .35s var(--ease);font-size:20px;line-height:1}
+.map-body{display:grid!important;grid-template-rows:0fr;padding:0;transition:grid-template-rows .38s var(--ease)}
+.map-area.open .map-body{grid-template-rows:1fr}
+.map-inner{overflow:hidden;min-height:0;padding:0 14px;opacity:0;visibility:hidden;
+  transition:opacity .25s ease,padding .38s var(--ease),visibility 0s .38s}
+.map-area.open .map-inner{opacity:1;visibility:visible;padding:2px 14px 16px;transition:opacity .3s ease .05s,padding .38s var(--ease),visibility 0s}
+.map-node{background:var(--bg);border-radius:15px;transition:border-color .2s}
+.map-node:hover{border-color:color-mix(in srgb,var(--accent) 30%,var(--line))}
+.map-node-head{transition:background .2s}
+.map-node-head:active{background:var(--hover)}
+.map-node-head strong{font-weight:600;letter-spacing:-.015em;font-size:14px}
+.count{font-weight:650}
+.mini{transition:transform .15s,background .2s}.mini:active{transform:scale(.88)}
+.mini-task{transition:background .2s;margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:10px}
+.mini-task:hover{background:var(--hover)}
+.mt-title{font-weight:500}
+.dot{transition:all .2s var(--ease)}
+.loose-label{font-weight:600;letter-spacing:.14em}
+
+/* Filas de tareas, notas y archivos */
+.task-row,.note-item{transition:background .2s;margin:0 -10px;padding-left:10px;padding-right:10px;border-radius:12px;border-bottom-color:transparent;position:relative}
+.task-row:hover,.note-item:hover{background:var(--hover)}
+.task-row+.task-row::before,.note-item+.note-item::before{content:"";position:absolute;top:0;left:10px;right:10px;height:1px;background:var(--line)}
+.task-row:hover::before,.task-row:hover+.task-row::before,.note-item:hover::before,.note-item:hover+.note-item::before{opacity:0}
+.task-text{font-weight:500;letter-spacing:-.01em}
+.task-text small{font-weight:450}
+.note-info strong{font-weight:600;letter-spacing:-.015em}
+.file-card{border-radius:15px;transition:border-color .2s,background .2s}
+.file-card:hover{background:var(--hover)}
+.file-info strong{font-weight:600}
+.quick-item{font-weight:550;transition:transform .15s,background .2s}
+.quick-item:active{transform:scale(.98)}
+.complete-btn{letter-spacing:-.01em;font-weight:650}
+.title-input{font-weight:650;letter-spacing:-.025em}
+.note-editor{line-height:1.75}
+.modal-head h2{font-weight:650}
+.close{transition:background .2s}.close:hover{background:var(--line)}
+.toast{font-weight:550}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand">ORGANIZER<small>YOUR PERSONAL WORKSPACE</small></div>
+ <div class="nav-label">GENERAL</div>
+ <button class="nav active" data-page="home"><span>⌂</span>Inicio</button>
+ <button class="nav" data-page="structure"><span>⌘</span>Organización</button>
+ <button class="nav" data-page="tasks"><span>☑</span>Todas las tareas</button>
+ <button class="nav" data-page="notes"><span>✎</span>Notas y bitácoras</button>
+ <button class="nav" data-page="study"><span>◷</span>Modo de estudio</button>
+ <div class="nav-label">RECURSOS</div>
+ <button class="nav" data-page="files"><span>▤</span>Biblioteca de archivos</button>
+ <button class="nav" data-page="settings"><span>⚙</span>Configuración</button>
+ <div class="side-bottom">
+  <div class="small muted" id="sideName">Juan Pablo</div>
+  <div class="small muted">Tu espacio personal</div>
+ </div>
+</aside>
+
+<main class="main">
+ <div class="top">
+  <div><small id="dateLabel"></small></div>
+  <div class="top-actions">
+   <input class="search" id="search" placeholder="⌕ Buscar…" onkeydown="if(event.key==='Enter')searchAll(this.value)">
+   <button class="icon-btn" onclick="toggleTheme()" aria-label="Tema">◐</button>
+   <button class="icon-btn" onclick="go('settings',{reset:true})" aria-label="Configuración">⚙</button>
+  </div>
+ </div>
+
+ <!-- INICIO -->
+ <section class="page active" id="page-home">
+  <div class="heading">
+   <h1 id="greeting">Buenos días</h1>
+   <p>Organiza tus ideas, aprende y avanza a tu ritmo.</p>
+  </div>
+  <div class="grid">
+   <div class="card s4"><div class="stat-label">Áreas</div><div class="stat" id="areaCount">0</div><div class="stat-label">Espacios</div></div>
+   <div class="card s4"><div class="stat-label">Pendientes</div><div class="stat" id="pendingCount">0</div><div class="stat-label">En todas tus áreas</div></div>
+   <div class="card s4"><div class="stat-label">Archivos</div><div class="stat" id="fileCount">0</div><div class="stat-label">Documentos y fotos</div></div>
+   <div class="card s12" id="dueCard" style="display:none">
+    <div class="card-head"><h2>Por atender</h2><span class="pill">FECHAS LÍMITE</span></div>
+    <div id="dueList"></div>
+    <div id="notifPrompt"></div>
+   </div>
+   <div class="card s7">
+    <div class="card-head"><h2>Tu espacio de trabajo</h2><button class="link" onclick="go('structure')">Ver mapa →</button></div>
+    <div class="area-grid" id="homeAreas"></div>
+   </div>
+   <div class="card s5">
+    <div class="card-head"><h2>Pendientes</h2><button class="link" onclick="go('tasks')">Ver todos →</button></div>
+    <div id="homeTasks"></div>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="openTask()">+ Nueva tarea</button>
+   </div>
+   <div class="card s12" id="recentNotesCard" style="display:none">
+    <div class="card-head"><h2>Notas recientes</h2><button class="link" onclick="go('notes')">Ver todas →</button></div>
+    <div id="recentNotes"></div>
+   </div>
+   <div class="card s12">
+    <div class="card-head"><h2>Tu siguiente paso</h2><span class="pill">ORGANIZER</span></div>
+    <p class="muted small">No necesitas resolver todo hoy. Elige una tarea, abre el material que necesitas y trabaja con calma.</p>
+    <button class="btn" onclick="go('study')">Entrar al modo de estudio →</button>
+   </div>
+  </div>
+ </section>
+
+ <!-- MAPA -->
+ <section class="page" id="page-structure">
+  <div class="heading"><h1>Organización</h1><p>Toca un área para abrirla. Toca una materia para ver su detalle y una tarea para editarla.</p></div>
+  <div class="map-tools">
+   <button class="btn" onclick="openArea()">+ Área</button>
+   <button class="btn secondary" onclick="openNode()">+ Materia / proyecto</button>
+   <button class="btn secondary" onclick="openTask()">+ Tarea</button>
+   <button class="btn secondary" onclick="toggleAllAreas(true)">Expandir todo</button>
+   <button class="btn secondary" onclick="toggleAllAreas(false)">Contraer todo</button>
+  </div>
+  <div class="map" id="orgChart"></div>
+ </section>
+
+ <!-- TAREAS -->
+ <section class="page" id="page-tasks">
+  <div class="heading"><h1>Tareas</h1><p>Toca una tarea para abrir sus notas, fotos y archivos.</p></div>
+  <div class="toolbar">
+   <button class="btn" onclick="openTask()">+ Nueva tarea</button>
+   <select class="field" style="width:auto" id="taskFilter" onchange="renderTasks()">
+    <option value="all">Todas</option><option value="pending">Pendientes</option><option value="done">Completadas</option>
+   </select>
+   <select class="field" style="width:auto" id="areaFilter" onchange="renderTasks()"><option value="all">Todas las áreas</option></select>
+  </div>
+  <div class="card"><div id="taskList"></div></div>
+ </section>
+
+ <!-- DETALLE DE TAREA -->
+ <section class="page" id="page-task">
+  <div id="taskDetail"></div>
+ </section>
+
+ <!-- NOTAS -->
+ <section class="page" id="page-notes">
+  <div class="heading"><h1>Notas y bitácoras</h1><p>Escribe libremente: ideas, bitácoras de trabajo, ensayos o lo que necesites. Todo se guarda solo.</p></div>
+  <div class="toolbar">
+   <button class="btn" onclick="newNote('Nota')">+ Nota</button>
+   <button class="btn secondary" onclick="newNote('Bitácora')">+ Bitácora</button>
+   <button class="btn secondary" onclick="newNote('Ensayo')">+ Ensayo</button>
+  </div>
+  <div class="toolbar">
+   <div class="seg" id="noteSeg"></div>
+   <input class="field" style="max-width:260px" id="noteSearch" placeholder="Buscar en notas…" oninput="noteQuery=this.value;renderNotes()">
+  </div>
+  <div class="card"><div id="noteList"></div></div>
+ </section>
+
+ <!-- EDITOR DE NOTA -->
+ <section class="page" id="page-note">
+  <div id="noteDetail"></div>
+ </section>
+
+ <!-- ESTUDIO -->
+ <section class="page" id="page-study">
+  <div class="heading"><h1>Modo de estudio</h1><p>Un espacio dedicado a aprender, repasar y concentrarte.</p></div>
+  <div class="card" style="margin-bottom:15px">
+   <div class="form-grid">
+    <div class="form-group"><label>Área</label><select class="field" id="studyArea" onchange="updateStudyNodes()"></select></div>
+    <div class="form-group"><label>Materia o proyecto</label><select class="field" id="studyNode" onchange="renderStudyContext()"></select></div>
+   </div>
+  </div>
+  <div class="study-layout">
+   <div>
+    <div class="card">
+     <div class="card-head"><h2 id="studyTitle">Selecciona una materia</h2><span class="pill">ESTUDIO ACTIVO</span></div>
+     <div id="studyContext" class="empty">Elige un área y una materia.</div>
+    </div>
+    <div class="card" style="margin-top:15px">
+     <div class="card-head"><h2>Apuntes de estudio</h2><button class="link" onclick="saveStudyNote()">Guardar apunte</button></div>
+     <textarea class="field note-area" id="studyNotes" placeholder="Fórmulas, conceptos, dudas o un resumen…" oninput="autoStudyNote()"></textarea>
+     <p class="small muted" id="studyNoteInd">Los apuntes se guardan solos y quedan vinculados a la materia.</p>
+    </div>
+   </div>
+   <div>
+    <div class="card">
+     <div class="study-timer">
+      <span class="pill">POMODORO</span>
+      <div class="timer-number" id="timer">25:00</div>
+      <div class="small muted" id="timerStatus">Listo para comenzar</div>
+      <div class="toolbar" style="justify-content:center;margin-top:18px">
+       <button class="btn" id="timerButton" onclick="toggleTimer()">Comenzar</button>
+       <button class="btn secondary" onclick="resetTimer()">Reiniciar</button>
+      </div>
+      <div class="toolbar" style="justify-content:center">
+       <button class="btn secondary small" onclick="setTimer(25)">25 min</button>
+       <button class="btn secondary small" onclick="setTimer(45)">45 min</button>
+       <button class="btn secondary small" onclick="setTimer(60)">60 min</button>
+      </div>
+     </div>
+     <div class="study-stat"><span>Sesiones completadas</span><strong id="sessions">0</strong></div>
+     <div class="study-stat"><span>Minutos registrados</span><strong id="minutes">0</strong></div>
+    </div>
+    <div class="card" style="margin-top:15px">
+     <h3>Consejo de estudio</h3>
+     <p class="small muted">Estudia un concepto, resuelve un ejercicio y explica con tus palabras lo que entendiste.</p>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <!-- ARCHIVOS -->
+ <section class="page" id="page-files">
+  <div class="heading"><h1>Biblioteca</h1><p>Tus PDFs, fotografías, diagramas y documentos organizados por área.</p></div>
+  <div class="toolbar">
+   <button class="btn" onclick="openUpload()">+ Subir archivos</button>
+   <select class="field" style="width:auto" id="fileFilter" onchange="renderFiles()"><option value="all">Todos los archivos</option></select>
+  </div>
+  <div class="card"><div id="fileList"></div></div>
+ </section>
+
+ <!-- CONFIGURACIÓN -->
+ <section class="page" id="page-settings">
+  <div class="heading"><h1>Configuración</h1><p>Personaliza tu espacio.</p></div>
+  <div class="card">
+   <div class="form-group"><label>Nombre</label><input class="field" id="profileName"></div>
+   <button class="btn" onclick="saveProfile()">Guardar nombre</button>
+   <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+   <div class="form-group"><label>Color de acento</label><input type="color" id="accentPicker" onchange="setAccent(this.value)"></div>
+   <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+   <h3>Notificaciones de tareas</h3>
+   <p class="small muted" id="notifInfo"></p>
+   <div class="toolbar">
+    <button class="btn" id="notifBtn" onclick="enableNotifications()">Activar avisos</button>
+    <button class="btn secondary" onclick="testNotification()">Probar aviso</button>
+   </div>
+   <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+   <div class="toolbar">
+    <button class="btn secondary" onclick="exportBackup()">Exportar datos</button>
+    <label class="btn secondary">Importar datos<input hidden type="file" accept=".json" onchange="importBackup(event)"></label>
+   </div>
+   <p class="small muted">Los archivos adjuntos se guardan localmente en este navegador. El respaldo JSON incluye tareas, notas y bitácoras, pero no los archivos binarios.</p>
+  </div>
+ </section>
+</main>
+</div>
+
+<button class="fab" onclick="modal('quickModal')" aria-label="Crear">+</button>
+
+<nav class="mobile-nav">
+ <button class="nav active" data-page="home"><span>⌂</span>Inicio</button>
+ <button class="nav" data-page="structure"><span>⌘</span>Mapa</button>
+ <button class="nav" data-page="tasks"><span>☑</span>Tareas</button>
+ <button class="nav" data-page="notes"><span>✎</span>Notas</button>
+ <button class="nav" data-page="study"><span>◷</span>Estudio</button>
+ <button class="nav" data-page="files"><span>▤</span>Archivos</button>
+</nav>
+
+<!-- MODALES -->
+<div class="modal" id="quickModal"><div class="modal-box">
+ <div class="modal-head"><h2>Crear</h2><button class="close" onclick="closeModal('quickModal')">×</button></div>
+ <button class="quick-item" onclick="closeModal('quickModal');openTask()"><span>☑</span>Nueva tarea</button>
+ <button class="quick-item" onclick="closeModal('quickModal');newNote('Nota')"><span>📝</span>Nueva nota</button>
+ <button class="quick-item" onclick="closeModal('quickModal');newNote('Bitácora')"><span>📓</span>Nueva bitácora</button>
+ <button class="quick-item" onclick="closeModal('quickModal');newNote('Ensayo')"><span>✍️</span>Nuevo ensayo</button>
+ <button class="quick-item" onclick="closeModal('quickModal');openNode()"><span>📚</span>Materia / proyecto</button>
+ <button class="quick-item" onclick="closeModal('quickModal');openArea()"><span>📁</span>Nueva área</button>
+</div></div>
+
+<div class="modal" id="areaModal"><div class="modal-box">
+ <div class="modal-head"><h2>Nueva área</h2><button class="close" onclick="closeModal('areaModal')">×</button></div>
+ <div class="form-group"><label>Nombre</label><input class="field" id="areaName" placeholder="Ej. Universidad"></div>
+ <div class="form-group"><label>Icono o emoji</label><input class="field" id="areaIcon" value="📁"></div>
+ <div class="form-group"><label>Descripción</label><input class="field" id="areaDescription" placeholder="¿Qué organizarás aquí?"></div>
+ <button class="btn" style="width:100%" onclick="createArea()">Crear área</button>
+</div></div>
+
+<div class="modal" id="nodeModal"><div class="modal-box">
+ <div class="modal-head"><h2>Nueva materia o proyecto</h2><button class="close" onclick="closeModal('nodeModal')">×</button></div>
+ <div class="form-group"><label>Nombre</label><input class="field" id="nodeName" placeholder="Ej. Estática"></div>
+ <div class="form-group"><label>Área principal</label><select class="field" id="nodeArea"></select></div>
+ <div class="form-group"><label>Tipo</label><select class="field" id="nodeType"><option>Materia</option><option>Proyecto</option><option>Curso</option><option>Categoría</option></select></div>
+ <button class="btn" style="width:100%" onclick="createNode()">Crear elemento</button>
+</div></div>
+
+<div class="modal" id="editModal"><div class="modal-box">
+ <div class="modal-head"><h2 id="editTitle">Editar</h2><button class="close" onclick="closeModal('editModal')">×</button></div>
+ <div class="form-group"><label>Nombre</label><input class="field" id="editName"></div>
+ <div class="form-group" id="editIconWrap"><label>Icono o emoji</label><input class="field" id="editIcon"></div>
+ <div class="form-group" id="editDescWrap"><label>Descripción</label><input class="field" id="editDesc"></div>
+ <div class="form-group" id="editTypeWrap"><label>Tipo</label><select class="field" id="editType"><option>Materia</option><option>Proyecto</option><option>Curso</option><option>Categoría</option></select></div>
+ <div class="toolbar"><button class="btn" onclick="saveEdit()">Guardar</button><button class="btn danger" onclick="deleteEdit()">Eliminar</button></div>
+</div></div>
+
+<div class="modal" id="taskModal"><div class="modal-box">
+ <div class="modal-head"><h2>Nueva tarea</h2><button class="close" onclick="closeModal('taskModal')">×</button></div>
+ <div class="form-group"><label>Título</label><input class="field" id="taskName" placeholder="Ej. Resolver ejercicios de vigas"></div>
+ <div class="form-grid">
+  <div class="form-group"><label>Área</label><select class="field" id="taskArea" onchange="updateTaskNodes()"></select></div>
+  <div class="form-group"><label>Materia / proyecto</label><select class="field" id="taskNode"></select></div>
+ </div>
+ <div class="form-grid">
+  <div class="form-group"><label>Prioridad</label><select class="field" id="taskPriority"><option>Normal</option><option>Alta</option><option>Baja</option></select></div>
+  <div class="form-group"><label>Fecha límite</label><input class="field" type="date" id="taskDate"></div>
+ </div>
+ <div class="form-group"><label>Hora (opcional, para avisarte antes)</label><input class="field" type="time" id="taskTime"></div>
+ <button class="btn" style="width:100%" onclick="createTask()">Guardar tarea</button>
+</div></div>
+
+<div class="modal" id="uploadModal"><div class="modal-box">
+ <div class="modal-head"><h2>Subir materiales</h2><button class="close" onclick="closeModal('uploadModal')">×</button></div>
+ <div class="form-group"><label>Archivos PDF, imágenes o documentos</label>
+  <input class="field" type="file" id="uploadInput" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.heic,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
+ </div>
+ <div class="form-group"><label>Área</label><select class="field" id="uploadArea" onchange="updateUploadNodes()"></select></div>
+ <div class="form-group"><label>Materia / proyecto</label><select class="field" id="uploadNode" onchange="updateUploadTasks()"></select></div>
+ <div class="form-group"><label>Vincular a tarea (opcional)</label><select class="field" id="uploadTask"></select></div>
+ <button class="btn" style="width:100%" onclick="uploadFiles()">Guardar archivos</button>
+</div></div>
+
+<div class="modal" id="sheetModal"><div class="modal-box wide">
+ <div class="modal-head"><h2 id="sheetTitle">Detalle</h2><button class="close" onclick="closeModal('sheetModal')">×</button></div>
+ <div id="sheetBody"></div>
+</div></div>
+
+<!-- VISOR COMPLETO (PDF / IMAGEN) -->
+<div class="viewer" id="viewer">
+ <div class="viewer-bar">
+  <div class="vt" id="viewerTitle">Archivo</div>
+  <button class="btn secondary" onclick="viewerZoomBy(-.5)">−</button>
+  <button class="btn secondary" onclick="viewerZoomBy(.5)">+</button>
+  <button class="btn secondary" onclick="viewerOpenTab()">↗</button>
+  <button class="btn secondary" onclick="viewerDownload()">⬇</button>
+  <button class="btn" onclick="closeViewer()">✕</button>
+ </div>
+ <div class="viewer-body" id="viewerBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==========================================
+   BASE DE DATOS LOCAL: IndexedDB
+========================================== */
+const DB_NAME="OrganizerWorkspaceDB",DB_VERSION=1;
+let db;
+function openDB(){
+ return new Promise((resolve,reject)=>{
+  const request=indexedDB.open(DB_NAME,DB_VERSION);
+  request.onupgradeneeded=()=>{
+   const d=request.result;
+   if(!d.objectStoreNames.contains("state"))d.createObjectStore("state",{keyPath:"id"});
+   if(!d.objectStoreNames.contains("files"))d.createObjectStore("files",{keyPath:"id"});
+  };
+  request.onsuccess=()=>{db=request.result;resolve(db)};
+  request.onerror=()=>reject(request.error);
+ });
+}
+const dbGet=(s,k)=>new Promise((res,rej)=>{const r=db.transaction(s,"readonly").objectStore(s).get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const dbPut=(s,v)=>new Promise((res,rej)=>{const tx=db.transaction(s,"readwrite");tx.objectStore(s).put(v);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)});
+const dbDelete=(s,k)=>new Promise((res,rej)=>{const tx=db.transaction(s,"readwrite");tx.objectStore(s).delete(k);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)});
+const dbAll=s=>new Promise((res,rej)=>{const r=db.transaction(s,"readonly").objectStore(s).getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+
+const initial={
+ name:"Juan Pablo",theme:"light",accent:"#007aff",
+ areas:[
+  {id:"a1",name:"Universidad",icon:"🎓",description:"Formación académica"},
+  {id:"a2",name:"Mecánica diésel",icon:"⚙️",description:"Motores, diagnóstico y cursos"},
+  {id:"a3",name:"Trabajo",icon:"💼",description:"Almacén y responsabilidades"},
+  {id:"a4",name:"Proyectos personales",icon:"✳️",description:"Ideas, objetivos y aprendizaje"}
+ ],
+ nodes:[
+  {id:"n1",areaId:"a1",name:"Precálculo",type:"Materia"},
+  {id:"n2",areaId:"a1",name:"Estática",type:"Materia"},
+  {id:"n3",areaId:"a1",name:"Seminario",type:"Materia"},
+  {id:"n4",areaId:"a1",name:"Diseño",type:"Materia"},
+  {id:"n5",areaId:"a1",name:"Redacción",type:"Materia"},
+  {id:"n6",areaId:"a1",name:"Programación",type:"Materia"},
+  {id:"n7",areaId:"a2",name:"Motores",type:"Categoría"},
+  {id:"n8",areaId:"a2",name:"Cummins",type:"Categoría"},
+  {id:"n9",areaId:"a2",name:"Detroit",type:"Categoría"},
+  {id:"n10",areaId:"a2",name:"Diagnóstico",type:"Curso"},
+  {id:"n11",areaId:"a3",name:"Almacén",type:"Categoría"},
+  {id:"n12",areaId:"a4",name:"Objetivos y aprendizaje",type:"Proyecto"}
+ ],
+ tasks:[],notes:[],journal:[],collapsed:{},notifEnabled:false,notified:{},sessions:0,minutes:0
+};
+
+let state;
+let currentPage="home",pageStack=[];
+let openTaskId=null,openNoteId=null,sheet=null,editing=null;
+let noteFilter="Todas",noteQuery="";
+let taskTimer=null,noteTimer=null,studyTimer=null;
+let timerDuration=1500,timerRemaining=1500,timerInterval=null,timerRunning=false;
+let objectUrls=[];
+let swReg=null;
+
+const $=id=>document.getElementById(id);
+const uid=()=>"id_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);
+const today=()=>new Date().toLocaleDateString("en-CA");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const persist=()=>dbPut("state",{id:"main",...state});
+async function saveState(){await persist();await renderAll()}
+function toast(msg){
+ $("toast").textContent=msg;$("toast").classList.add("show");
+ clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("show"),2400);
+}
+function modal(id,open=true){$(id).classList.toggle("open",open)}
+function closeModal(id){modal(id,false)}
+function closeAllModals(){document.querySelectorAll(".modal.open").forEach(m=>m.classList.remove("open"))}
+
+/* ---------- Fechas ---------- */
+function daysUntil(d){
+ const a=new Date(d+"T00:00:00"),b=new Date(today()+"T00:00:00");
+ return Math.round((a-b)/86400000);
+}
+function shortDate(d){return new Date(d+"T00:00:00").toLocaleDateString("es-MX",{day:"numeric",month:"short"})}
+function dueChip(t){
+ if(!t.date)return "";
+ if(t.done)return `<span class="chip green">✓ ${esc(shortDate(t.date))}</span>`;
+ const d=daysUntil(t.date),time=t.time?" · "+esc(t.time):"";
+ if(d<0)return `<span class="chip red">Vencida · ${esc(shortDate(t.date))}</span>`;
+ if(d===0)return `<span class="chip orange">Hoy${time}</span>`;
+ if(d===1)return `<span class="chip blue">Mañana${time}</span>`;
+ return `<span class="chip">${esc(shortDate(t.date))}${time}</span>`;
+}
+
+/* ---------- Navegación ---------- */
+function go(page,opts={}){
+ if(currentPage==="task"&&page!=="task")flushTaskEdits();
+ if(currentPage==="note"&&page!=="note"){flushNoteEdits();cleanupNote()}
+ if(opts.reset)pageStack=[];
+ else if(!opts.back&&currentPage!==page)pageStack.push(currentPage);
+ pageStack=pageStack.slice(-15);
+ currentPage=page;
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ $("page-"+page).classList.add("active");
+ const navPage={task:"tasks",note:"notes"}[page]||page;
+ document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===navPage));
+ if(page==="structure")renderOrg();
+ if(page==="tasks")renderTasks();
+ if(page==="files")renderFiles();
+ if(page==="study")renderStudyContext();
+ if(page==="notes")renderNotes();
+ if(page==="task")renderTaskDetail();
+ if(page==="note")renderNoteEditor();
+ if(page==="settings")renderNotifInfo();
+ window.scrollTo({top:0});
+}
+function goBack(){const p=pageStack.pop()||"home";go(p,{back:true})}
+document.querySelectorAll(".nav").forEach(n=>n.addEventListener("click",()=>{closeAllModals();go(n.dataset.page,{reset:true})}));
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open")}));
+
+/* ---------- Perfil y tema ---------- */
+function updateGreeting(){
+ const h=new Date().getHours();
+ const prefix=h<12&&h>=5?"Buenos días":h<19&&h>=12?"Buenas tardes":"Buenas noches";
+ $("greeting").textContent=prefix+", "+state.name;
+ $("sideName").textContent=state.name;
+ $("dateLabel").textContent=new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+}
+function applyTheme(){
+ document.body.classList.toggle("dark",state.theme==="dark");
+ const light=state.accent&&state.accent.toLowerCase()!=="#007aff";
+ if(light){document.documentElement.style.setProperty("--accent",state.accent);document.documentElement.style.setProperty("--accent-soft",state.accent+"22")}
+ else{document.documentElement.style.removeProperty("--accent");document.documentElement.style.removeProperty("--accent-soft")}
+ const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=state.theme==="dark"?"#000000":"#f5f5f7";
+}
+function toggleTheme(){state.theme=state.theme==="dark"?"light":"dark";applyTheme();persist()}
+function setAccent(c){state.accent=c;applyTheme();persist()}
+function saveProfile(){state.name=$("profileName").value.trim()||"Juan Pablo";persist();updateGreeting();toast("Perfil actualizado")}
+
+/* ---------- Selectores ---------- */
+function fillSelect(id,items,placeholder){
+ const s=$(id),prev=s.value;
+ s.innerHTML=placeholder?`<option value="">${esc(placeholder)}</option>`:"";
+ items.forEach(x=>{const o=document.createElement("option");o.value=x.id;o.textContent=x.name;s.appendChild(o)});
+ if([...s.options].some(o=>o.value===prev))s.value=prev;
+}
+function updateTaskNodes(){fillSelect("taskNode",state.nodes.filter(n=>n.areaId===$("taskArea").value),"Sin materia o proyecto")}
+function updateStudyNodes(){fillSelect("studyNode",state.nodes.filter(n=>n.areaId===$("studyArea").value),"Selecciona una materia");renderStudyContext()}
+function updateUploadNodes(){fillSelect("uploadNode",state.nodes.filter(n=>n.areaId===$("uploadArea").value),"Sin materia");updateUploadTasks()}
+function updateUploadTasks(){
+ const nodeId=$("uploadNode").value,areaId=$("uploadArea").value;
+ const tasks=state.tasks.filter(t=>nodeId?t.nodeId===nodeId:t.areaId===areaId);
+ $("uploadTask").innerHTML='<option value="">No vincular a tarea</option>'+tasks.map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join("");
+}
+
+/* ==========================================
+   ÁREAS / MATERIAS / PROYECTOS
+========================================== */
+function openArea(){$("areaName").value="";$("areaDescription").value="";$("areaIcon").value="📁";modal("areaModal")}
+async function createArea(){
+ const name=$("areaName").value.trim();if(!name)return toast("Escribe un nombre");
+ state.areas.push({id:uid(),name,icon:$("areaIcon").value||"📁",description:$("areaDescription").value});
+ await saveState();closeModal("areaModal");toast("Área creada");
+}
+function openNode(areaId){
+ fillSelect("nodeArea",state.areas);
+ if(areaId)$("nodeArea").value=areaId;
+ $("nodeName").value="";modal("nodeModal");
+}
+async function createNode(){
+ const name=$("nodeName").value.trim(),areaId=$("nodeArea").value;
+ if(!name||!areaId)return toast("Completa los campos");
+ state.nodes.push({id:uid(),areaId,name,type:$("nodeType").value});
+ await saveState();closeModal("nodeModal");toast("Elemento añadido");
+}
+function openEdit(type,id){
+ const item=(type==="area"?state.areas:state.nodes).find(x=>x.id===id);if(!item)return;
+ editing={type,id};
+ $("editTitle").textContent=type==="area"?"Editar área":"Editar materia / proyecto";
+ $("editName").value=item.name;
+ $("editIconWrap").style.display=$("editDescWrap").style.display=type==="area"?"":"none";
+ $("editTypeWrap").style.display=type==="node"?"":"none";
+ if(type==="area"){$("editIcon").value=item.icon;$("editDesc").value=item.description||""}
+ else $("editType").value=item.type;
+ modal("editModal");
+}
+async function saveEdit(){
+ if(!editing)return;
+ const item=(editing.type==="area"?state.areas:state.nodes).find(x=>x.id===editing.id);if(!item)return;
+ const name=$("editName").value.trim();if(!name)return toast("Escribe un nombre");
+ item.name=name;
+ if(editing.type==="area"){item.icon=$("editIcon").value||"📁";item.description=$("editDesc").value}
+ else item.type=$("editType").value;
+ await saveState();closeModal("editModal");toast("Cambios guardados");
+}
+async function deleteEdit(){
+ if(!editing)return;
+ const {type,id}=editing;
+ if(type==="area"){
+  if(!confirm("¿Eliminar esta área con sus materias, tareas y archivos?"))return;
+  const nodeIds=state.nodes.filter(n=>n.areaId===id).map(n=>n.id);
+  for(const f of await dbAll("files"))if(f.areaId===id)await dbDelete("files",f.id);
+  state.tasks=state.tasks.filter(t=>t.areaId!==id);
+  state.nodes=state.nodes.filter(n=>n.areaId!==id);
+  state.areas=state.areas.filter(a=>a.id!==id);
+  state.journal.forEach(n=>{if(n.areaId===id||nodeIds.includes(n.nodeId)){n.areaId="";n.nodeId=""}});
+ }else{
+  if(!confirm("¿Eliminar esta materia/proyecto? Sus tareas y archivos quedarán sin materia."))return;
+  state.tasks.forEach(t=>{if(t.nodeId===id)t.nodeId=null});
+  for(const f of await dbAll("files"))if(f.nodeId===id){f.nodeId=null;await dbPut("files",f)}
+  state.journal.forEach(n=>{if(n.nodeId===id)n.nodeId=""});
+  state.nodes=state.nodes.filter(n=>n.id!==id);
+ }
+ await saveState();closeAllModals();toast("Eliminado");
+}
+
+/* ==========================================
+   TAREAS
+========================================== */
+function openTask(areaId,nodeId){
+ fillSelect("taskArea",state.areas);
+ if(areaId)$("taskArea").value=areaId;
+ updateTaskNodes();
+ if(nodeId)$("taskNode").value=nodeId;
+ $("taskName").value="";$("taskDate").value="";$("taskTime").value="";$("taskPriority").value="Normal";
+ modal("taskModal");
+}
+async function createTask(){
+ const title=$("taskName").value.trim(),areaId=$("taskArea").value;
+ if(!title||!areaId)return toast("Escribe una tarea y selecciona un área");
+ state.tasks.push({id:uid(),title,areaId,nodeId:$("taskNode").value||null,priority:$("taskPriority").value,
+  date:$("taskDate").value,time:$("taskDate").value?$("taskTime").value:"",done:false,notes:"",created:new Date().toISOString()});
+ await saveState();closeModal("taskModal");toast("Tarea guardada");checkReminders();
+}
+async function toggleTask(id){
+ const t=state.tasks.find(x=>x.id===id);if(!t)return;
+ if(currentPage==="task"&&id===openTaskId)flushTaskEdits();
+ t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;
+ await saveState();
+ if(currentPage==="task"&&id===openTaskId)renderTaskDetail();
+ if(t.done)toast("Tarea completada ✓");
+}
+async function removeTask(id){
+ if(!confirm("¿Eliminar esta tarea y sus archivos?"))return;
+ for(const f of await dbAll("files"))if(f.taskId===id)await dbDelete("files",f.id);
+ state.tasks=state.tasks.filter(t=>t.id!==id);
+ await saveState();
+ if(currentPage==="task"){openTaskId=null;goBack()}
+}
+function taskHTML(t){
+ const area=state.areas.find(a=>a.id===t.areaId),node=state.nodes.find(n=>n.id===t.nodeId);
+ const pr=t.priority&&t.priority!=="Normal"?` · ${esc(t.priority)}`:"";
+ return `<div class="task-row">
+  <input type="checkbox" ${t.done?"checked":""} onclick="event.stopPropagation()" onchange="toggleTask('${t.id}')">
+  <div class="task-text ${t.done?"done":""}" onclick="openTaskDetail('${t.id}')">${esc(t.title)}
+   <small>${esc(area?.name||"Área eliminada")}${node?" → "+esc(node.name):""}${pr}</small></div>
+  ${dueChip(t)}<span class="chev" onclick="openTaskDetail('${t.id}')">›</span></div>`;
+}
+function renderTasks(){
+ const filter=$("taskFilter").value,area=$("areaFilter").value;
+ let list=state.tasks.filter(t=>(filter==="all"||(filter==="done"&&t.done)||(filter==="pending"&&!t.done))&&(area==="all"||t.areaId===area));
+ list.sort((a,b)=>(a.done-b.done)||((a.date||"9999")>(b.date||"9999")?1:-1));
+ $("taskList").innerHTML=list.length?list.map(taskHTML).join(""):'<div class="empty">No hay tareas en esta vista.</div>';
+}
+
+/* ---------- Detalle de tarea (autoguardado) ---------- */
+function openTaskDetail(id){
+ if(currentPage==="task")flushTaskEdits();
+ closeAllModals();openTaskId=id;go("task");
+}
+function setInd(txt,saving){const i=$("saveInd");if(i){i.textContent=txt;i.classList.toggle("saving",!!saving)}}
+function flushTaskEdits(){
+ clearTimeout(taskTimer);
+ const box=$("taskDetail"),t=state.tasks.find(x=>x.id===box.dataset.tid);
+ const ti=$("tdTitle"),no=$("tdNotes");
+ if(!t||!ti||!no)return;
+ const newTitle=ti.value.trim()||t.title;
+ if(t.title!==newTitle||t.notes!==no.value){t.title=newTitle;t.notes=no.value;persist().catch(()=>{})}
+}
+function autoTask(){
+ setInd("Guardando…",true);clearTimeout(taskTimer);
+ taskTimer=setTimeout(()=>{flushTaskEdits();setInd("Guardado ✓");refreshLists()},600);
+}
+function refreshLists(){renderHome();renderOrg();renderTasks()}
+async function tdSet(field,val){
+ const t=state.tasks.find(x=>x.id===openTaskId);if(!t)return;
+ flushTaskEdits();
+ t[field]=val;
+ if(field==="areaId")t.nodeId=null;
+ if(field==="date"&&!val)t.time="";
+ await persist();
+ if(field==="areaId"||field==="nodeId"||field==="areaId"){
+  for(const f of await dbAll("files"))if(f.taskId===t.id){f.areaId=t.areaId;f.nodeId=t.nodeId;await dbPut("files",f)}
+ }
+ await renderAll();
+ if(field==="areaId"||field==="date")renderTaskDetail();
+ setInd("Guardado ✓");checkReminders();
+}
+async function renderTaskDetail(){
+ const box=$("taskDetail"),t=state.tasks.find(x=>x.id===openTaskId);
+ if(!t){box.innerHTML='<div class="empty">Selecciona una tarea.</div>';return}
+ revokeUrls();
+ box.dataset.tid=t.id;
+ const files=(await dbAll("files")).filter(f=>f.taskId===t.id);
+ const imgs=files.filter(f=>f.type.startsWith("image/")),others=files.filter(f=>!f.type.startsWith("image/"));
+ const nodes=state.nodes.filter(n=>n.areaId===t.areaId);
+ const thumbs=imgs.map(f=>{const u=URL.createObjectURL(f.blob);objectUrls.push(u);
+  return `<div class="thumb"><img src="${u}" alt="${esc(f.name)}" onclick="openViewer('${f.id}')"><button onclick="deleteFile('${f.id}',true)" aria-label="Eliminar">×</button></div>`}).join("");
+ box.innerHTML=`
+ <div class="detail-top"><button class="btn secondary small" onclick="goBack()">‹ Volver</button><span class="save-ind" id="saveInd">Guardado ✓</span></div>
+ <div class="card" style="margin-bottom:14px">
+  <button class="complete-btn ${t.done?"done":""}" onclick="toggleTask('${t.id}')">${t.done?"✓ Completada · toca para reabrir":"Marcar como completada"}</button>
+  <input class="field title-input" id="tdTitle" value="${esc(t.title)}" oninput="autoTask()" placeholder="Título de la tarea">
+  <div class="form-grid">
+   <div class="form-group"><label>Área</label><select class="field" onchange="tdSet('areaId',this.value)">${state.areas.map(a=>`<option value="${a.id}" ${a.id===t.areaId?"selected":""}>${esc(a.name)}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Materia / proyecto</label><select class="field" onchange="tdSet('nodeId',this.value||null)"><option value="">Sin materia</option>${nodes.map(n=>`<option value="${n.id}" ${n.id===t.nodeId?"selected":""}>${esc(n.name)}</option>`).join("")}</select></div>
+  </div>
+  <div class="form-grid">
+   <div class="form-group"><label>Prioridad</label><select class="field" onchange="tdSet('priority',this.value)">${["Normal","Alta","Baja"].map(p=>`<option ${p===t.priority?"selected":""}>${p}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Fecha límite</label><input class="field" type="date" value="${esc(t.date||"")}" onchange="tdSet('date',this.value)"></div>
+  </div>
+  ${t.date?`<div class="form-group"><label>Hora límite (opcional, te avisa 1 hora antes)</label><input class="field" type="time" value="${esc(t.time||"")}" onchange="tdSet('time',this.value)"></div>`:""}
+  <div>${dueChip(t)}</div>
+ </div>
+ <div class="card" style="margin-bottom:14px">
+  <div class="card-head"><h2>Notas</h2><span class="small muted">Se guardan solas</span></div>
+  <textarea class="field note-area" id="tdNotes" oninput="autoTask()" placeholder="Escribe aquí lo que necesites recordar, pasos, dudas, resultados…">${esc(t.notes||"")}</textarea>
+ </div>
+ <div class="card" style="margin-bottom:14px">
+  <div class="card-head"><h2>Fotos e imágenes</h2><span class="count">${imgs.length}</span></div>
+  <div class="toolbar" style="margin-bottom:0">
+   <button class="btn" onclick="$('tdCam').click()">📷 Tomar foto</button>
+   <button class="btn secondary" onclick="$('tdImg').click()">🖼 Galería</button>
+   <button class="btn secondary" onclick="$('tdDoc').click()">📎 PDF / archivo</button>
+  </div>
+  <input type="file" id="tdCam" accept="image/*" capture="environment" hidden onchange="addTaskMedia([...this.files]);this.value=''">
+  <input type="file" id="tdImg" accept="image/*" multiple hidden onchange="addTaskMedia([...this.files]);this.value=''">
+  <input type="file" id="tdDoc" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" multiple hidden onchange="addTaskMedia([...this.files]);this.value=''">
+  ${imgs.length?`<div class="thumbs">${thumbs}</div>`:'<div class="empty">Aún no hay fotos. Toma una o súbela desde tu galería.</div>'}
+  ${others.length?`<h3 style="margin:18px 0 10px">Documentos</h3>${others.map(fileHTML).join("")}`:""}
+ </div>
+ <button class="btn danger" style="width:100%" onclick="removeTask('${t.id}')">Eliminar tarea</button>`;
+}
+async function addTaskMedia(list){
+ const t=state.tasks.find(x=>x.id===openTaskId);if(!t||!list.length)return;
+ flushTaskEdits();toast("Guardando…");
+ for(const f of list){
+  const blob=await compressImage(f);
+  await dbPut("files",{id:uid(),name:blob.name||f.name,type:blob.type||f.type||"application/octet-stream",size:blob.size,
+   areaId:t.areaId,nodeId:t.nodeId,taskId:t.id,blob,added:new Date().toISOString()});
+ }
+ await renderAll();await renderTaskDetail();toast("Guardado ✓");
+}
+function compressImage(file,max=2000,q=.86){
+ return new Promise(res=>{
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size<500000){res(file);return}
+  const img=new Image(),url=URL.createObjectURL(file);
+  img.onload=()=>{
+   const r=Math.min(1,max/Math.max(img.width,img.height));
+   const c=document.createElement("canvas");c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);
+   c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);
+   c.toBlob(b=>res(b&&b.size<file.size?new File([b],file.name.replace(/\.\w+$/,"")+".jpg",{type:"image/jpeg"}):file),"image/jpeg",q);
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);res(file)};
+  img.src=url;
+ });
+}
+function revokeUrls(){objectUrls.forEach(u=>URL.revokeObjectURL(u));objectUrls=[]}
+
+/* ==========================================
+   MAPA (ORGANIGRAMA MÓVIL)
+========================================== */
+function miniTask(t){
+ return `<div class="mini-task" onclick="openTaskDetail('${t.id}')">
+  <span class="dot ${t.done?"done":""}" onclick="event.stopPropagation();toggleTask('${t.id}')">${t.done?"✓":""}</span>
+  <span class="mt-title ${t.done?"done":""}">${esc(t.title)}</span>${dueChip(t)}</div>`;
+}
+function renderOrg(){
+ if(!state.areas.length){$("orgChart").innerHTML='<div class="empty card">Crea tu primera área para empezar.</div>';return}
+ $("orgChart").innerHTML=state.areas.map(a=>{
+  const nodes=state.nodes.filter(n=>n.areaId===a.id);
+  const tasks=state.tasks.filter(t=>t.areaId===a.id);
+  const pend=tasks.filter(t=>!t.done).length;
+  const open=!state.collapsed[a.id];
+  const loose=tasks.filter(t=>!nodes.some(n=>n.id===t.nodeId));
+  return `<section class="map-area ${open?"open":""}" data-area="${a.id}">
+   <div class="map-area-head" onclick="toggleArea('${a.id}')">
+    <div class="map-ico">${esc(a.icon)}</div>
+    <div class="map-title"><strong>${esc(a.name)}</strong><small>${nodes.length} ${nodes.length===1?"materia":"materias"} · ${pend} pendientes</small></div>
+    <button class="mini" onclick="event.stopPropagation();openSheet('area','${a.id}')" aria-label="Opciones">⋯</button>
+    <span class="chev">›</span>
+   </div>
+   <div class="map-body"><div class="map-inner">
+    ${nodes.map(n=>{
+     const nt=tasks.filter(t=>t.nodeId===n.id);
+     const sorted=[...nt].sort((x,y)=>(x.done-y.done));
+     return `<div class="map-node">
+      <div class="map-node-head" onclick="openSheet('node','${n.id}')">
+       <span class="pill">${esc(n.type.toUpperCase())}</span><strong>${esc(n.name)}</strong>
+       <span class="count">${nt.filter(t=>!t.done).length}</span>
+       <button class="mini acc" onclick="event.stopPropagation();openTask('${a.id}','${n.id}')" aria-label="Nueva tarea">+</button>
+      </div>
+      ${sorted.length?`<div class="map-tasks">${sorted.map(miniTask).join("")}</div>`:""}
+     </div>`}).join("")}
+    ${loose.length?`<div class="loose-label">SIN MATERIA</div><div class="map-node"><div class="map-tasks">${loose.map(miniTask).join("")}</div></div>`:""}
+    <div class="map-actions">
+     <button class="btn secondary small" onclick="openNode('${a.id}')">+ Materia / proyecto</button>
+     <button class="btn small" onclick="openTask('${a.id}')">+ Tarea</button>
+    </div>
+   </div></div>
+  </section>`;
+ }).join("");
+}
+function toggleArea(id){
+ state.collapsed[id]=!state.collapsed[id];persist();
+ const el=document.querySelector('[data-area="'+id+'"]');
+ if(el)el.classList.toggle("open",!state.collapsed[id]);else renderOrg();
+}
+function toggleAllAreas(open){
+ state.areas.forEach(a=>state.collapsed[a.id]=!open);persist();
+ document.querySelectorAll("[data-area]").forEach(el=>el.classList.toggle("open",open));
+}
+
+/* ---------- Hoja de detalle (área / materia) ---------- */
+function openSheet(type,id){sheet={type,id};renderSheet();modal("sheetModal")}
+function renderSheet(){
+ if(!sheet)return;
+ const body=$("sheetBody");
+ if(sheet.type==="area"){
+  const a=state.areas.find(x=>x.id===sheet.id);if(!a){closeModal("sheetModal");return}
+  const nodes=state.nodes.filter(n=>n.areaId===a.id),tasks=state.tasks.filter(t=>t.areaId===a.id);
+  $("sheetTitle").textContent="Área";
+  body.innerHTML=`<div class="detail-hero"><div style="font-size:28px">${esc(a.icon)}</div><h2>${esc(a.name)}</h2><div class="small muted">${esc(a.description||"Área personal")}</div></div>
+   <div class="toolbar"><button class="btn" onclick="closeModal('sheetModal');openNode('${a.id}')">+ Materia / proyecto</button>
+   <button class="btn secondary" onclick="closeModal('sheetModal');openTask('${a.id}')">+ Tarea</button>
+   <button class="btn secondary" onclick="closeModal('sheetModal');openUpload('${a.id}')">+ Archivo</button>
+   <button class="btn secondary" onclick="closeModal('sheetModal');openEdit('area','${a.id}')">Editar</button></div>
+   <p class="small muted">${nodes.length} elementos · ${tasks.length} tareas · ${tasks.filter(t=>!t.done).length} pendientes</p>
+   ${nodes.map(n=>`<div class="file-card" onclick="openSheet('node','${n.id}')" style="cursor:pointer"><div class="file-icon">▤</div><div class="file-info"><strong>${esc(n.name)}</strong><small>${esc(n.type)} · ${state.tasks.filter(t=>t.nodeId===n.id).length} tareas</small></div><span class="chev">›</span></div>`).join("")}`;
+ }else{
+  const n=state.nodes.find(x=>x.id===sheet.id);if(!n){closeModal("sheetModal");return}
+  const a=state.areas.find(x=>x.id===n.areaId);
+  const tasks=state.tasks.filter(t=>t.nodeId===n.id);
+  const files=(window.filesCache||[]).filter(f=>f.nodeId===n.id&&!f.taskId);
+  const notes=state.journal.filter(j=>j.nodeId===n.id);
+  $("sheetTitle").textContent=n.type;
+  body.innerHTML=`<div class="detail-hero"><span class="pill">${esc(n.type.toUpperCase())}</span><h2>${esc(n.name)}</h2><div class="small muted">${esc(a?.name||"")}</div></div>
+   <div class="toolbar"><button class="btn" onclick="closeModal('sheetModal');openTask('${n.areaId}','${n.id}')">+ Tarea</button>
+   <button class="btn secondary" onclick="closeModal('sheetModal');openUpload('${n.areaId}','${n.id}')">+ Material</button>
+   <button class="btn secondary" onclick="closeModal('sheetModal');startStudy('${n.areaId}','${n.id}')">Estudiar</button>
+   <button class="btn secondary" onclick="closeModal('sheetModal');openEdit('node','${n.id}')">Editar</button></div>
+   <h3 style="margin:18px 0 8px">Tareas</h3>
+   ${tasks.length?tasks.map(taskHTML).join(""):'<div class="empty">Todavía no hay tareas.</div>'}
+   ${notes.length?`<h3 style="margin:18px 0 8px">Notas</h3>${notes.map(noteHTML).join("")}`:""}
+   <h3 style="margin:18px 0 8px">Materiales</h3>
+   ${files.length?files.map(fileHTML).join(""):'<div class="empty">No hay archivos vinculados.</div>'}`;
+ }
+}
+function startStudy(areaId,nodeId){
+ go("study");$("studyArea").value=areaId;updateStudyNodes();$("studyNode").value=nodeId;renderStudyContext();
+}
+
+/* ==========================================
+   ARCHIVOS + VISOR COMPLETO
+========================================== */
+async function openUpload(areaId,nodeId,taskId){
+ await refreshFiles();
+ fillSelect("uploadArea",state.areas);
+ if(areaId)$("uploadArea").value=areaId;
+ updateUploadNodes();
+ if(nodeId){$("uploadNode").value=nodeId;updateUploadTasks()}
+ if(taskId)$("uploadTask").value=taskId;
+ $("uploadInput").value="";modal("uploadModal");
+}
+async function uploadFiles(){
+ const chosen=[...$("uploadInput").files];
+ if(!chosen.length)return toast("Selecciona uno o más archivos");
+ const areaId=$("uploadArea").value,nodeId=$("uploadNode").value||null,taskId=$("uploadTask").value||null;
+ if(!areaId)return toast("Selecciona un área");
+ toast("Guardando…");
+ for(const file of chosen){
+  const blob=await compressImage(file);
+  await dbPut("files",{id:uid(),name:file.name,type:blob.type||file.type||"application/octet-stream",size:blob.size,areaId,nodeId,taskId,blob,added:new Date().toISOString()});
+ }
+ closeModal("uploadModal");await renderAll();toast("Archivos guardados");
+}
+async function refreshFiles(){window.filesCache=await dbAll("files")}
+function fileHTML(f){
+ const icon=f.type==="application/pdf"?"📕":f.type.startsWith("image/")?"🖼️":"📄";
+ const a=state.areas.find(x=>x.id===f.areaId),n=state.nodes.find(x=>x.id===f.nodeId),t=state.tasks.find(x=>x.id===f.taskId);
+ return `<div class="file-card">
+  <div class="file-icon">${icon}</div>
+  <div class="file-info"><strong>${esc(f.name)}</strong>
+   <small>${esc(a?.name||"Área")}${n?" → "+esc(n.name):""}${t?" · Tarea: "+esc(t.title):""} · ${formatSize(f.size)}</small></div>
+  <button class="link" onclick="openViewer('${f.id}')">Abrir</button>
+  <button class="link" onclick="deleteFile('${f.id}')">×</button></div>`;
+}
+function formatSize(b){return b<1024?b+" B":b<1048576?(b/1024).toFixed(1)+" KB":(b/1048576).toFixed(1)+" MB"}
+async function renderFiles(){
+ await refreshFiles();
+ const filter=$("fileFilter").value;
+ const list=window.filesCache.filter(f=>filter==="all"||f.areaId===filter);
+ $("fileList").innerHTML=list.length?list.map(fileHTML).join(""):'<div class="empty">Tu biblioteca está vacía. Sube tu primer PDF o imagen.</div>';
+}
+async function deleteFile(id,stay){
+ if(!confirm("¿Eliminar este archivo?"))return;
+ await dbDelete("files",id);await renderAll();
+ if(currentPage==="task")renderTaskDetail();
+ toast("Archivo eliminado");
+}
+
+/* --- Visor: PDF completo con pdf.js (todas las páginas) --- */
+const PDF_CDN="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+let pdfPromise=null,viewerFile=null,viewerUrl=null,viewerZoom=1,viewerToken=0,viewerPdf=null,viewerObserver=null;
+function loadPdfJs(){
+ if(window.pdfjsLib)return Promise.resolve();
+ if(pdfPromise)return pdfPromise;
+ pdfPromise=new Promise((res,rej)=>{
+  const s=document.createElement("script");s.src=PDF_CDN+"pdf.min.js";
+  s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc=PDF_CDN+"pdf.worker.min.js";res()};
+  s.onerror=()=>{pdfPromise=null;rej(new Error("cdn"))};
+  document.head.appendChild(s);
+ });
+ return pdfPromise;
+}
+async function openViewer(id){
+ const f=await dbGet("files",id);if(!f)return;
+ closeViewer(true);
+ viewerFile=f;viewerZoom=1;viewerUrl=URL.createObjectURL(f.blob);
+ $("viewerTitle").textContent=f.name;
+ $("viewer").classList.add("open");document.body.style.overflow="hidden";
+ renderViewer();
+}
+function closeViewer(silent){
+ viewerToken++;
+ if(viewerObserver){viewerObserver.disconnect();viewerObserver=null}
+ if(viewerPdf){try{viewerPdf.destroy()}catch(e){}viewerPdf=null}
+ if(viewerUrl){const u=viewerUrl;setTimeout(()=>URL.revokeObjectURL(u),30000);viewerUrl=null}
+ $("viewer").classList.remove("open");$("viewerBody").innerHTML="";
+ if(!silent)document.body.style.overflow="";
+}
+function viewerZoomBy(d){
+ viewerZoom=Math.max(1,Math.min(4,viewerZoom+d));
+ if(viewerFile)renderViewer();
+}
+function viewerOpenTab(){if(viewerUrl)window.open(viewerUrl,"_blank")}
+function viewerDownload(){
+ if(!viewerUrl||!viewerFile)return;
+ const a=document.createElement("a");a.href=viewerUrl;a.download=viewerFile.name;document.body.appendChild(a);a.click();a.remove();
+}
+async function renderViewer(){
+ const f=viewerFile,body=$("viewerBody");if(!f)return;
+ if(f.type.startsWith("image/")){
+  body.innerHTML=`<img class="viewer-img" src="${viewerUrl}" alt="${esc(f.name)}" style="width:${viewerZoom*100}%;max-width:none">`;
+ }else if(f.type==="application/pdf"||/\.pdf$/i.test(f.name)){
+  await renderPdf(f.blob);
+ }else{
+  body.innerHTML=`<div class="empty">Vista previa no disponible para este formato.<br><br><button class="btn" onclick="viewerDownload()">Descargar archivo</button></div>`;
+ }
+}
+async function renderPdf(blob){
+ const token=++viewerToken,body=$("viewerBody");
+ if(viewerObserver){viewerObserver.disconnect();viewerObserver=null}
+ body.innerHTML='<div class="empty">Cargando PDF…</div>';
+ try{
+  if(!viewerPdf){
+   await loadPdfJs();
+   const data=await blob.arrayBuffer();
+   const pdf=await pdfjsLib.getDocument({data}).promise;
+   if(token!==viewerToken){pdf.destroy();return}
+   viewerPdf=pdf;
+  }
+  const pdf=viewerPdf;
+  const first=await pdf.getPage(1),vp1=first.getViewport({scale:1});
+  const fit=Math.max(200,(body.clientWidth-20))*viewerZoom;
+  const ratio=vp1.height/vp1.width;
+  const wrap=document.createElement("div");wrap.className="pdf-pages";wrap.style.width=fit+"px";
+  for(let i=1;i<=pdf.numPages;i++){
+   const d=document.createElement("div");d.className="pdf-page";d.dataset.page=i;
+   d.style.width=fit+"px";d.style.height=Math.round(fit*ratio)+"px";
+   wrap.appendChild(d);
+  }
+  body.innerHTML="";body.appendChild(wrap);
+  viewerObserver=new IntersectionObserver(entries=>{
+   entries.forEach(en=>{if(en.isIntersecting&&!en.target.dataset.done){en.target.dataset.done="1";drawPdfPage(en.target,token,fit)}});
+  },{root:body,rootMargin:"900px 0px"});
+  wrap.querySelectorAll(".pdf-page").forEach(el=>viewerObserver.observe(el));
+ }catch(err){
+  if(token!==viewerToken)return;
+  body.innerHTML=`<div style="height:100%;display:flex;flex-direction:column;gap:10px">
+   <div class="empty">No se pudo cargar el visor completo (requiere internet la primera vez). Mostrando el visor del navegador.</div>
+   <iframe src="${viewerUrl}" style="flex:1;min-height:70vh;width:100%;border:0;border-radius:12px;background:#fff"></iframe>
+   <button class="btn" onclick="viewerOpenTab()">Abrir PDF en otra pestaña</button></div>`;
+ }
+}
+async function drawPdfPage(el,token,fit){
+ try{
+  if(token!==viewerToken||!viewerPdf)return;
+  const n=Number(el.dataset.page),page=await viewerPdf.getPage(n);
+  const base=page.getViewport({scale:1}),scale=fit/base.width,vp=page.getViewport({scale});
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const c=document.createElement("canvas");
+  c.width=Math.floor(vp.width*dpr);c.height=Math.floor(vp.height*dpr);
+  el.style.height=Math.round(vp.height)+"px";
+  el.appendChild(c);
+  await page.render({canvasContext:c.getContext("2d"),viewport:vp,transform:[dpr,0,0,dpr,0,0]}).promise;
+  const pn=document.createElement("span");pn.className="pn";pn.textContent=n+" / "+viewerPdf.numPages;el.appendChild(pn);
+ }catch(e){}
+}
+
+/* ==========================================
+   NOTAS, BITÁCORAS Y ENSAYOS
+========================================== */
+const NOTE_ICONS={"Nota":"📝","Bitácora":"📓","Ensayo":"✍️"};
+function stamp(){return new Date().toLocaleString("es-MX",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"})}
+async function newNote(type){
+ const n={id:uid(),type,title:"",content:type==="Bitácora"?"📅 "+stamp()+"\n\n":"",areaId:"",nodeId:"",pinned:false,created:new Date().toISOString(),updated:new Date().toISOString()};
+ state.journal.unshift(n);await persist();
+ openNoteId=n.id;go("note");
+ setTimeout(()=>{const c=$("ndContent");if(c){c.focus();c.setSelectionRange(c.value.length,c.value.length)}},60);
+}
+function openNote(id){closeAllModals();if(currentPage==="note")flushNoteEdits();openNoteId=id;go("note")}
+function noteHTML(n){
+ const area=state.areas.find(a=>a.id===n.areaId),node=state.nodes.find(x=>x.id===n.nodeId);
+ const snippet=(n.content||"").replace(/\s+/g," ").trim().slice(0,110);
+ const date=new Date(n.updated).toLocaleDateString("es-MX",{day:"numeric",month:"short"});
+ return `<div class="note-item" onclick="openNote('${n.id}')">
+  <div class="note-ico">${NOTE_ICONS[n.type]||"📝"}</div>
+  <div class="note-info"><strong>${esc(n.title||"Sin título")}</strong>
+   <small>${esc(snippet||"Nota vacía")}</small>
+   <small>${esc(n.type)} · ${date}${area?" · "+esc(area.name):""}${node?" → "+esc(node.name):""}</small></div>
+  ${n.pinned?"<span>📌</span>":""}</div>`;
+}
+function renderNotes(){
+ const types=["Todas","Nota","Bitácora","Ensayo"];
+ $("noteSeg").innerHTML=types.map(t=>`<button class="${t===noteFilter?"active":""}" onclick="noteFilter='${t}';renderNotes()">${t==="Todas"?"Todas":(NOTE_ICONS[t]+" "+t+"s")}</button>`).join("");
+ const q=noteQuery.trim().toLowerCase();
+ const list=state.journal.filter(n=>(noteFilter==="Todas"||n.type===noteFilter)&&(!q||(n.title+" "+n.content).toLowerCase().includes(q)))
+  .sort((a,b)=>(b.pinned-a.pinned)||(a.updated<b.updated?1:-1));
+ $("noteList").innerHTML=list.length?list.map(noteHTML).join(""):'<div class="empty">Aquí aparecerán tus notas, bitácoras y ensayos.<br>Toca “+ Nota” para empezar a escribir.</div>';
+}
+function flushNoteEdits(){
+ clearTimeout(noteTimer);
+ const box=$("noteDetail"),n=state.journal.find(x=>x.id===box.dataset.nid);
+ const ti=$("ndTitle"),co=$("ndContent");
+ if(!n||!ti||!co)return;
+ if(n.title!==ti.value||n.content!==co.value){n.title=ti.value;n.content=co.value;n.updated=new Date().toISOString();persist().catch(()=>{})}
+}
+function autoNote(){
+ const co=$("ndContent");
+ if(co){const w=co.value.trim()?co.value.trim().split(/\s+/).length:0;$("ndCount").textContent=w+" palabras · "+co.value.length+" caracteres"}
+ const i=$("ndInd");if(i){i.textContent="Guardando…";i.classList.add("saving")}
+ clearTimeout(noteTimer);
+ noteTimer=setTimeout(()=>{flushNoteEdits();const i2=$("ndInd");if(i2){i2.textContent="Guardado ✓";i2.classList.remove("saving")}renderHome()},600);
+}
+function cleanupNote(){
+ const n=state.journal.find(x=>x.id===openNoteId);
+ if(n&&!n.title.trim()&&!n.content.replace(/📅[^\n]*/,"").trim()){
+  state.journal=state.journal.filter(x=>x.id!==n.id);persist().catch(()=>{});openNoteId=null;
+ }
+}
+async function ndSet(field,val){
+ const n=state.journal.find(x=>x.id===openNoteId);if(!n)return;
+ flushNoteEdits();n[field]=val;
+ if(field==="areaId")n.nodeId="";
+ if(field!=="pinned")n.updated=new Date().toISOString();
+ await persist();renderNoteEditor();renderHome();
+}
+function renderNoteEditor(){
+ const box=$("noteDetail"),n=state.journal.find(x=>x.id===openNoteId);
+ if(!n){box.innerHTML='<div class="empty">Selecciona una nota.</div>';return}
+ box.dataset.nid=n.id;
+ const nodes=state.nodes.filter(x=>x.areaId===n.areaId);
+ const words=n.content.trim()?n.content.trim().split(/\s+/).length:0;
+ box.innerHTML=`
+ <div class="detail-top"><button class="btn secondary small" onclick="goBack()">‹ Volver</button>
+  <span class="save-ind" id="ndInd">Guardado ✓</span>
+  <button class="btn secondary small" onclick="ndSet('pinned',${!n.pinned})">${n.pinned?"📌 Fijada":"Fijar"}</button></div>
+ <div class="card">
+  <div class="form-grid" style="margin-bottom:12px">
+   <select class="field" onchange="ndSet('type',this.value)">${["Nota","Bitácora","Ensayo"].map(t=>`<option ${t===n.type?"selected":""}>${t}</option>`).join("")}</select>
+   <select class="field" onchange="ndSet('areaId',this.value)"><option value="">Sin área</option>${state.areas.map(a=>`<option value="${a.id}" ${a.id===n.areaId?"selected":""}>${esc(a.name)}</option>`).join("")}</select>
+  </div>
+  ${n.areaId?`<select class="field" style="margin-bottom:12px" onchange="ndSet('nodeId',this.value)"><option value="">Sin materia / proyecto</option>${nodes.map(x=>`<option value="${x.id}" ${x.id===n.nodeId?"selected":""}>${esc(x.name)}</option>`).join("")}</select>`:""}
+  <input class="field title-input" id="ndTitle" value="${esc(n.title)}" placeholder="Título" oninput="autoNote()">
+  <textarea class="field note-editor" id="ndContent" placeholder="Escribe libremente…" oninput="autoNote()">${esc(n.content)}</textarea>
+  <div class="small muted" id="ndCount" style="margin:10px 2px">${words} palabras · ${n.content.length} caracteres</div>
+  <div class="toolbar" style="margin-bottom:0">
+   <button class="btn secondary small" onclick="insertStamp()">🕒 Insertar fecha y hora</button>
+   <button class="btn secondary small" onclick="exportNote()">⬇ Exportar .txt</button>
+   <button class="btn danger small" onclick="deleteNote()">Eliminar</button>
+  </div>
+ </div>`;
+}
+function insertStamp(){
+ const c=$("ndContent");if(!c)return;
+ const add=(c.value&&!c.value.endsWith("\n\n")?"\n\n":"")+"📅 "+stamp()+"\n\n";
+ c.value+=add;c.focus();c.setSelectionRange(c.value.length,c.value.length);autoNote();
+}
+function exportNote(){
+ flushNoteEdits();
+ const n=state.journal.find(x=>x.id===openNoteId);if(!n)return;
+ const blob=new Blob([(n.title?n.title+"\n\n":"")+n.content],{type:"text/plain;charset=utf-8"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download=((n.title||"nota").replace(/[^\w\-áéíóúñÁÉÍÓÚÑ ]/g,"").trim()||"nota")+".txt";
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+async function deleteNote(){
+ if(!confirm("¿Eliminar esta nota?"))return;
+ state.journal=state.journal.filter(x=>x.id!==openNoteId);openNoteId=null;
+ await persist();await renderAll();goBack();toast("Nota eliminada");
+}
+
+/* ==========================================
+   MODO DE ESTUDIO
+========================================== */
+function renderStudyContext(keepNote){
+ const areaId=$("studyArea").value,nodeId=$("studyNode").value;
+ const node=state.nodes.find(n=>n.id===nodeId),area=state.areas.find(a=>a.id===areaId);
+ $("studyTitle").textContent=node?.name||area?.name||"Selecciona una materia";
+ const refId=nodeId||areaId||null;
+ const tasks=state.tasks.filter(t=>nodeId?t.nodeId===nodeId:t.areaId===areaId);
+ const files=(window.filesCache||[]).filter(f=>nodeId?f.nodeId===nodeId:f.areaId===areaId);
+ $("studyContext").innerHTML=!areaId?'<div class="empty">Selecciona un área.</div>':`
+  <div class="small muted">${esc(area?.name||"")}${node?" → "+esc(node.name):""}</div>
+  <h3 style="margin:18px 0 8px">Tareas relacionadas</h3>
+  ${tasks.length?tasks.map(taskHTML).join(""):'<div class="empty">No hay tareas para esta materia.</div>'}
+  <h3 style="margin:18px 0 8px">Material de estudio</h3>
+  ${files.length?files.map(fileHTML).join(""):'<div class="empty">No hay documentos todavía.</div>'}
+  <button class="btn secondary" onclick="openUpload('${areaId}','${nodeId}')">+ Añadir PDF o imagen</button>`;
+ if(keepNote===true&&$("studyNotes").dataset.ref===refId)return;
+ const note=state.notes.find(n=>n.refId===refId);
+ $("studyNotes").value=note?.content||"";$("studyNotes").dataset.ref=refId||"";
+}
+function currentStudyRef(){return $("studyNode").value||$("studyArea").value||null}
+function autoStudyNote(){clearTimeout(studyTimer);studyTimer=setTimeout(()=>writeStudyNote(true),700)}
+async function writeStudyNote(quiet){
+ const ref=currentStudyRef();if(!ref)return;
+ const content=$("studyNotes").value;
+ let note=state.notes.find(n=>n.refId===ref);
+ if(note)note.content=content;else state.notes.push({id:uid(),refId:ref,content});
+ await persist();$("studyNoteInd").textContent="Guardado ✓";
+ if(!quiet)toast("Apunte guardado");
+}
+function saveStudyNote(){if(!currentStudyRef())return toast("Selecciona una materia primero");writeStudyNote(false)}
+function showTimer(){
+ const m=Math.floor(timerRemaining/60),s=timerRemaining%60;
+ $("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+}
+function setTimer(min){
+ clearInterval(timerInterval);timerDuration=min*60;timerRemaining=timerDuration;timerRunning=false;
+ $("timerButton").textContent="Comenzar";$("timerStatus").textContent="Listo para comenzar";showTimer();
+}
+function toggleTimer(){
+ if(timerRunning){
+  clearInterval(timerInterval);timerRunning=false;$("timerButton").textContent="Continuar";$("timerStatus").textContent="Sesión pausada";
+ }else{
+  timerRunning=true;$("timerButton").textContent="Pausar";$("timerStatus").textContent="Concéntrate en una sola cosa";
+  timerInterval=setInterval(async()=>{
+   timerRemaining--;showTimer();
+   if(timerRemaining<=0){
+    clearInterval(timerInterval);timerRunning=false;
+    state.sessions++;state.minutes+=Math.round(timerDuration/60);
+    await saveState();toast("¡Sesión de estudio completada!");
+    notify("Sesión completada","Buen trabajo, toma un descanso.","pomodoro");
+    setTimer(Math.round(timerDuration/60));
+   }
+  },1000);
+ }
+}
+function resetTimer(){setTimer(Math.round(timerDuration/60))}
+
+/* ==========================================
+   NOTIFICACIONES
+========================================== */
+const notifOK=()=>"Notification" in window;
+async function notify(title,body,tag){
+ if(!notifOK()||Notification.permission!=="granted")return false;
+ try{
+  if(swReg&&swReg.showNotification){await swReg.showNotification(title,{body,tag,renotify:false});return true}
+  new Notification(title,{body,tag});return true;
+ }catch(e){return false}
+}
+async function enableNotifications(){
+ if(!notifOK())return toast("Este navegador no admite notificaciones");
+ const perm=await Notification.requestPermission();
+ state.notifEnabled=perm==="granted";await persist();renderNotifInfo();renderHome();
+ if(perm==="granted"){toast("Avisos activados");checkReminders()}
+ else toast("Permiso no concedido. Actívalo en los ajustes del navegador.");
+}
+async function testNotification(){
+ if(!notifOK()||Notification.permission!=="granted")return toast("Primero activa los avisos");
+ const ok=await notify("Organizer","Así se verán tus avisos de tareas.","test");
+ toast(ok?"Aviso enviado":"Tu navegador bloqueó el aviso");
+}
+function renderNotifInfo(){
+ const info=$("notifInfo"),btn=$("notifBtn");if(!info)return;
+ if(!notifOK()){info.textContent="Este navegador no admite notificaciones.";btn.style.display="none";return}
+ btn.style.display="";
+ const p=Notification.permission;
+ if(p==="granted"&&state.notifEnabled){info.textContent="Avisos activados. Te aviso de tareas con fecha límite que estén vencidas, vencen hoy (a partir de las 8:00), vencen mañana (a partir de las 18:00) o faltan menos de 1 hora si pusiste hora. Funcionan mientras Organizer esté abierto o en segundo plano.";btn.textContent="Avisos activados ✓"}
+ else if(p==="denied"){info.textContent="El permiso está bloqueado. Actívalo desde los ajustes del navegador o de la app para este sitio.";btn.textContent="Reintentar"}
+ else{info.textContent="Activa los avisos para recibir recordatorios de tareas con fecha límite. En iPhone, primero agrega Organizer a la pantalla de inicio.";btn.textContent="Activar avisos"}
+}
+function dueTasks(){
+ return state.tasks.filter(t=>!t.done&&t.date&&daysUntil(t.date)<=1).sort((a,b)=>(a.date+(a.time||""))>(b.date+(b.time||""))?1:-1);
+}
+function renderDueBanner(){
+ const due=dueTasks(),card=$("dueCard");
+ const needNotif=notifOK()&&!(Notification.permission==="granted"&&state.notifEnabled)&&state.tasks.some(t=>!t.done&&t.date);
+ card.style.display=due.length||needNotif?"":"none";
+ $("dueList").innerHTML=due.length?due.map(taskHTML).join(""):"";
+ $("notifPrompt").innerHTML=needNotif?`<button class="btn secondary" style="margin-top:12px" onclick="enableNotifications()">🔔 Activar avisos de tareas</button>`:"";
+}
+async function checkReminders(){
+ renderDueBanner();
+ if(!notifOK()||!state.notifEnabled||Notification.permission!=="granted")return;
+ const now=new Date(),td=today();let changed=false;
+ state.notified=state.notified||{};
+ for(const k of Object.keys(state.notified))if(!k.endsWith(":"+td)){delete state.notified[k];changed=true}
+ for(const t of state.tasks){
+  if(t.done||!t.date)continue;
+  const d=daysUntil(t.date);let stage=null,msg="";
+  if(d<0){stage="over";msg="Venció el "+shortDate(t.date)}
+  else if(d===0){
+   if(t.time){const due=new Date(t.date+"T"+t.time),mins=(due-now)/60000;
+    if(mins<=60&&mins>-120){stage="soon";msg=mins>0?"Vence en "+Math.max(1,Math.round(mins))+" min ("+t.time+")":"Venció hace un momento ("+t.time+")"}}
+   if(!stage&&now.getHours()>=8){stage="today";msg="Vence hoy"+(t.time?" a las "+t.time:"")}
+  }else if(d===1&&now.getHours()>=18){stage="tmr";msg="Vence mañana"+(t.time?" a las "+t.time:"")}
+  if(!stage)continue;
+  const key=t.id+":"+stage+":"+td;
+  if(state.notified[key])continue;
+  state.notified[key]=1;changed=true;
+  await notify("📌 "+t.title,msg,t.id+stage);
+ }
+ if(changed)persist().catch(()=>{});
+}
+
+/* ==========================================
+   BÚSQUEDA, RESPALDO, RENDER GENERAL
+========================================== */
+function searchAll(q){
+ q=q.trim().toLowerCase();if(!q)return;
+ const area=state.areas.find(a=>a.name.toLowerCase().includes(q));
+ const node=state.nodes.find(n=>n.name.toLowerCase().includes(q));
+ const task=state.tasks.find(t=>t.title.toLowerCase().includes(q));
+ const note=state.journal.find(n=>(n.title+" "+n.content).toLowerCase().includes(q));
+ if(area){go("structure");openSheet("area",area.id)}
+ else if(node){go("structure");openSheet("node",node.id)}
+ else if(task)openTaskDetail(task.id);
+ else if(note)openNote(note.id);
+ else toast("Sin resultados");
+}
+function exportBackup(){
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="organizer-backup.json";a.click();URL.revokeObjectURL(url);
+}
+function importBackup(e){
+ const file=e.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=async()=>{
+  try{
+   const incoming=JSON.parse(reader.result);
+   if(!incoming.areas||!incoming.nodes||!incoming.tasks)throw new Error();
+   state={...structuredClone(initial),...incoming};await saveState();applyTheme();toast("Datos importados");
+  }catch(err){toast("El archivo no es válido")}
+ };
+ reader.readAsText(file);
+}
+function renderHome(){
+ $("areaCount").textContent=state.areas.length;
+ $("pendingCount").textContent=state.tasks.filter(t=>!t.done).length;
+ $("fileCount").textContent=(window.filesCache||[]).length;
+ $("homeAreas").innerHTML=state.areas.map(a=>`
+  <div class="area-card" onclick="go('structure');openSheet('area','${a.id}')">
+   <div class="area-icon">${esc(a.icon)}</div><strong>${esc(a.name)}</strong>
+   <small>${state.nodes.filter(n=>n.areaId===a.id).length} materias · ${state.tasks.filter(t=>t.areaId===a.id&&!t.done).length} pendientes</small>
+  </div>`).join("");
+ const pending=state.tasks.filter(t=>!t.done).sort((a,b)=>((a.date||"9999")>(b.date||"9999")?1:-1)).slice(0,5);
+ $("homeTasks").innerHTML=pending.length?pending.map(taskHTML).join(""):'<div class="empty">No tienes tareas pendientes.</div>';
+ const recent=[...state.journal].sort((a,b)=>a.updated<b.updated?1:-1).slice(0,3);
+ $("recentNotesCard").style.display=recent.length?"":"none";
+ $("recentNotes").innerHTML=recent.map(noteHTML).join("");
+ renderDueBanner();
+}
+async function renderAll(){
+ await refreshFiles();
+ updateGreeting();renderHome();renderOrg();renderTasks();renderNotes();
+ if(currentPage==="files")renderFiles();
+ $("sessions").textContent=state.sessions;$("minutes").textContent=state.minutes;
+ fillSelect("areaFilter",state.areas,"Todas las áreas");
+ fillSelect("fileFilter",state.areas,"Todos los archivos");
+ fillSelect("studyArea",state.areas,"Selecciona un área");
+ if(state.areas.length&&!$("studyArea").value)$("studyArea").value=state.areas[0].id;
+ fillSelect("studyNode",state.nodes.filter(n=>n.areaId===$("studyArea").value),"Selecciona una materia");
+ renderStudyContext(true);
+ if($("sheetModal").classList.contains("open"))renderSheet();
+ if(document.activeElement!==$("profileName"))$("profileName").value=state.name;
+ $("accentPicker").value=state.accent||"#007aff";
+}
+
+/* ---------- Inicio ---------- */
+async function init(){
+ await openDB();
+ const saved=await dbGet("state","main");
+ if(saved){
+  state={...structuredClone(initial),...saved};
+  if(state.accent==="#526ee8")state.accent="#007aff";
+  state.tasks.forEach(t=>{if(t.notes===undefined)t.notes="";if(t.time===undefined)t.time=""});
+ }else{state=structuredClone(initial);await dbPut("state",{id:"main",...state})}
+ applyTheme();
+ await renderAll();showTimer();renderNotifInfo();
+ if(location.protocol.startsWith("http")&&"serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").then(r=>{swReg=r}).catch(()=>{});
+ }
+ checkReminders();
+ setInterval(checkReminders,60000);
+}
+init().catch(err=>{console.error(err);alert("No se pudo iniciar el almacenamiento. Abre ORGANIZER en un navegador compatible.")});
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){
+  if($("viewer").classList.contains("open"))closeViewer();
+  else closeAllModals();
+ }
+});
+document.addEventListener("visibilitychange",()=>{
+ if(!document.hidden){showTimer();if(state){updateGreeting();checkReminders()}}
+ else{if(currentPage==="task")flushTaskEdits();if(currentPage==="note")flushNoteEdits()}
+});
+window.addEventListener("pagehide",()=>{if(currentPage==="task")flushTaskEdits();if(currentPage==="note")flushNoteEdits()});
+</script>
+</body>
+</html>
